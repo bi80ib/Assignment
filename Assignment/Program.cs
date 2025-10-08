@@ -15,10 +15,32 @@ namespace Assignment
 
             Player[] players = new Player[3];
             PlayerArray a1 = new PlayerArray();
-            Player p1 = new Player(2);
-            a1.addPlayer(p1, players);
-            a1.PrintArray(players);
             
+            int repeat = 0;
+            while (repeat == 0)
+            {
+                Console.WriteLine("1 : Add Player");
+                Console.WriteLine("2 : Search Player");
+                Console.WriteLine("3 : Show all Players");
+                int choice = Convert.ToInt32(Console.ReadLine());
+                if (choice == 1)
+                {
+                    a1.AddPlayer(players);
+                }
+                else if (choice == 2)
+                {
+                    a1.SearchArray(players);
+                }
+                else if (choice == 3)
+                {
+                    a1.PrintArray(players);
+                }
+            }
+
+
+
+
+             
 
 
         }
@@ -54,13 +76,13 @@ namespace Assignment
         class PlayerArray
         {
 
-            public void addPlayer(Player player, Player[] players)
+            public void AddPlayer( Player[] players)
             {
-                for (int i = 0; i < players.Length; i++)
+                for (int i = 1; i < players.Length; i++)
                 {
                     if (players[i] == null)
                     {
-                        players[i] = player;
+                        players[i] = new Player(i);
                         break;
                     }
                     else 
@@ -72,6 +94,27 @@ namespace Assignment
             
             }
 
+            public void SearchArray(Player[] players)
+            {
+                Console.WriteLine("Enter id");
+                
+                int checkID = Convert.ToInt32(Console.ReadLine());
+                foreach (Player player in players)
+                {
+                    if(player != null && player.id == checkID)
+                    {
+                      
+                        Console.WriteLine(player.id);
+                      
+                    }
+
+                    Console.WriteLine("Not found");
+                   
+                    
+                }
+                
+            }
+            
             public void PrintArray(Player[] players)
             {
                 foreach (Player player in players)
@@ -82,6 +125,8 @@ namespace Assignment
                     }
                 }
             }
+
+
 
 
         }
