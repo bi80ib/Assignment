@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Deployment.Internal;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -14,7 +15,11 @@ namespace Assignment
 
             Player[] players = new Player[3];
             PlayerArray a1 = new PlayerArray();
+            Player p1 = new Player(2);
+            a1.addPlayer(p1, players);
+            a1.PrintArray(players);
             
+
 
         }
 
@@ -34,6 +39,16 @@ namespace Assignment
                 this.id = id;
                 this.username = username;
             }
+
+            public Player(int id)
+            {
+                hoursPlayed = 0;
+                highScore = 0;
+                this.id = id;
+                username = "";
+
+
+            }
         }
 
         class PlayerArray
@@ -41,21 +56,34 @@ namespace Assignment
 
             public void addPlayer(Player player, Player[] players)
             {
-                for (int i = 0; i < players.Length; i++) 
+                for (int i = 0; i < players.Length; i++)
                 {
-                    if(players[i] != null)
+                    if (players[i] == null)
                     {
                         players[i] = player;
+                        break;
                     }
-                    else
+                    else 
                     {
                         Console.WriteLine("Full");
                     }
                 }
-
-
-
+           
             
+            }
+
+            public void PrintArray(Player[] players)
+            {
+                foreach (Player player in players)
+                {
+                    if (player != null)
+                    {
+                        Console.WriteLine(player.id);
+                    }
+                }
+            }
+
+
         }
     }
 }
