@@ -28,27 +28,8 @@ namespace Assignment
             if (File.Exists(file))
             {
                 Console.WriteLine("File exists");
-                string[] lines = File.ReadAllLines(file);
-                foreach (string line in lines)
-                {
-                    char[] delimiter = { ',' };
-                    string[] result = line.Split(delimiter);
-                  
-                                 
-                      
+               FileHandler.WriteFiletoArray( file, players);
 
-                    for(int i=0; i< players.Length; i++)
-                    {
-                    players[i] = new Player(result[0], result[1], Convert.ToInt32(result[2]), Convert.ToInt32(result[3]));
-                        break;
-                    }
-
-
-
-
-
-                }
-                
 
             }
          
@@ -91,20 +72,51 @@ namespace Assignment
 
         static class FileHandler
         {
-            public static void WriteToFile(string file, Player[] players)
+            public static void WriteFiletoArray(string file, Player[] players)
             {
-                using (StreamWriter sw = new StreamWriter(file))
+                using (StreamReader sr = new StreamReader(file))
                 {
-                    foreach (Player player in players)
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
                     {
-                        if (player != null)
+                        char[] delimiter = { ',' };
+                        string[] result = line.Split(delimiter);
+                        for (int i = 0; i < players.Length; i++)
                         {
-                            sw.WriteLine($"{player.id}, {player.username},{player.highScore},{player.hoursPlayed}");
+                            players[i] = new Player(result[0], result[1], Convert.ToInt32(result[2]), Convert.ToInt32(result[3]));
+                            break;
                         }
                     }
-                    sw.Close();
                 }
             }
+
+            public static void UpdatePlayer(string file, Player[] players, string username)
+            {
+                using (StreamReader sr = new StreamReader(file))
+                {
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        char[] delimiter = { ',' };
+                        string[] result = line.Split(delimiter);
+                        for (int i = 0; i < players.Length; i++)
+                        {
+                            using (StreamWriter sw = new StreamWriter(file))
+                            {
+                                if (players[i] != null && players[i].username == username)
+                                {
+                                    sw.WriteLine($"{players[i].id}, {players[i].username},{players[i].highScore},{players[i].hoursPlayed}");
+                                }
+                                else
+                                {
+                                    sw.WriteLine(line);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
         }
         class Player
         {
@@ -138,9 +150,10 @@ namespace Assignment
             {
                 Console.WriteLine("Enter new high score");
                 highScore =  Convert.ToInt32(Console.ReadLine());
+                FileHandler.UpdatePlayer("Record.txt", players, username);
 
 
-                
+
 
             }
 
@@ -159,12 +172,28 @@ namespace Assignment
                Console.WriteLine("Enter username");
                 string username = Console.ReadLine();
 
-               FileHandler.WriteToFile( file, players);
-                    
-             }
+                for (int i = 1; i < players.Length; i++)
+                {
+                    if (players[i] == null)
+                    {
+                        string id = i.ToString();
+                        players[i] = new Player(id,username);
+                        using (StreamWriter sw = new StreamWriter(file,true))
+                        {
+                            sw.WriteLine($"{players[i].id}, {players[i].username},{players[i].highScore},{players[i].hoursPlayed}");
+                            sw.Close();
+                        }
+                        break;
+
+                    }
+                    else 
+                    {
+                        Console.WriteLine("Full");
+                    }
+                }
            
             
-            
+            }
 
             public void SearchArray(Player[] players)
             {
