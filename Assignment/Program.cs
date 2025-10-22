@@ -33,16 +33,13 @@ namespace Assignment
                 {
                     char[] delimiter = { ',' };
                     string[] result = line.Split(delimiter);
-                    Console.WriteLine(result.Length);               
-                       foreach (string s in result)
-                    {
-                        Console.WriteLine(s);
-
-                    }
+                  
+                                 
+                      
 
                     for(int i=0; i< players.Length; i++)
                     {
-                        players[i] = new Player(result[0], result[1]);
+                    players[i] = new Player(result[0], result[1], Convert.ToInt32(result[2]), Convert.ToInt32(result[3]));
                         break;
                     }
 
@@ -54,13 +51,15 @@ namespace Assignment
                 
 
             }
-
-            
-           
+         
 
 
 
-            int repeat = 0;
+
+
+
+
+                int repeat = 0;
             while (repeat == 0)
             {
                 Console.WriteLine("1 : Add Player");
@@ -79,6 +78,7 @@ namespace Assignment
                 {
                     a1.PrintArray(players, file);
                 }
+
             }
 
 
@@ -89,21 +89,39 @@ namespace Assignment
 
         }
 
+        static class FileHandler
+        {
+            public static void WriteToFile(string file, Player[] players)
+            {
+                using (StreamWriter sw = new StreamWriter(file))
+                {
+                    foreach (Player player in players)
+                    {
+                        if (player != null)
+                        {
+                            sw.WriteLine($"{player.id}, {player.username},{player.highScore},{player.hoursPlayed}");
+                        }
+                    }
+                    sw.Close();
+                }
+            }
+        }
         class Player
         {
-            public int hoursPlayed { get; set; }
-            public int highScore { get; set; }
+            public int hoursPlayed { get; private set; }
+            public int highScore { get; private set; }
 
-            public string id { get; set; }
+            public string id { get; set;}
 
             public string username { get; set; }
 
-            public Player(int hoursPlayed, int highScore, string id, string username)
+            public Player(string id, string username, int highScore, int hoursPlayed)
             {
-                this.hoursPlayed = hoursPlayed;
-                this.highScore = highScore;
                 this.id = id;
                 this.username = username;
+                this.hoursPlayed = hoursPlayed;
+                this.highScore = highScore;
+               
             }
 
             public Player(string id,string username)
@@ -113,6 +131,16 @@ namespace Assignment
                 this.id = id;
                 this.username = username;
 
+
+            }
+
+            public void UpdateHighScore()
+            {
+                Console.WriteLine("Enter new high score");
+                highScore =  Convert.ToInt32(Console.ReadLine());
+
+
+                
 
             }
 
@@ -131,28 +159,12 @@ namespace Assignment
                Console.WriteLine("Enter username");
                 string username = Console.ReadLine();
 
-                for (int i = 1; i < players.Length; i++)
-                {
-                    if (players[i] == null)
-                    {
-                        string id = i.ToString();
-                        players[i] = new Player(id,username);
-                        using (StreamWriter sw = new StreamWriter(file,true))
-                        {
-                            sw.WriteLine($"{players[i].id}, {players[i].username}");
-                            sw.Close();
-                        }
-                        break;
-
-                    }
-                    else 
-                    {
-                        Console.WriteLine("Full");
-                    }
-                }
+               FileHandler.WriteToFile( file, players);
+                    
+             }
            
             
-            }
+            
 
             public void SearchArray(Player[] players)
             {
@@ -177,7 +189,8 @@ namespace Assignment
                 {
                     if (player != null && Convert.ToInt32(player.id) == checkID)
                     {
-                        Console.WriteLine(player.id);
+                        Console.WriteLine(player);
+                        player.UpdateHighScore();
                     }
                     else
                     {
@@ -194,7 +207,7 @@ namespace Assignment
                 {
                     if (player != null && player.username == checkUsername)
                     {
-                        Console.WriteLine(player.username);
+                        Console.WriteLine(player);
                     }
                     else
                     {
