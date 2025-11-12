@@ -6,8 +6,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Text.Json;
 
-    
+
 
 
 namespace Assignment
@@ -17,30 +18,41 @@ namespace Assignment
         static void Main(string[] args)
         {
 
-            Player[] players = new Player[3];
-            PlayerArray a1 = new PlayerArray();
-            string file = "Record.txt";
+            List<Player> players = new List<Player>();
+            PlayerList a1 = new PlayerList();
+            string file = "Record.json";
 
-          
-           
-            
 
-            if (File.Exists(file))
+
+
+
+            try
             {
-                Console.WriteLine("File exists");
-               FileHandler.WriteFiletoArray( file, players);
-
-
+                if (File.Exists(file))
+                {
+                    string json = File.ReadAllText(file);
+                    players = JsonSerializer.Deserialize<List<Player>>(json);
+                   
+                }
+               
             }
-         
+            catch (Exception ex)
+            {
+               
+                players = new List<Player>();
+            }
+
+
+            foreach (Player p in players)
+            {
+                Console.WriteLine(p);
+            }
 
 
 
 
 
-
-
-                int repeat = 0;
+            int repeat = 0;
             while (repeat == 0)
             {
                 Console.WriteLine("1 : Add Player");
@@ -70,54 +82,12 @@ namespace Assignment
 
         }
 
-        static class FileHandler
-        {
-            public static void WriteFiletoArray(string file, Player[] players)
-            {
-                using (StreamReader sr = new StreamReader(file))
-                {
-                    string line;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        char[] delimiter = { ',' };
-                        string[] result = line.Split(delimiter);
-                        for (int i = 0; i < players.Length; i++)
-                        {
-                            players[i] = new Player(result[0], result[1], Convert.ToInt32(result[2]), Convert.ToInt32(result[3]));
-                            break;
-                        }
-                    }
-                }
-            }
+        
+           
 
-            public static void UpdatePlayer(string file, Player[] players, string username)
-            {
-                using (StreamReader sr = new StreamReader(file))
-                {
-                    string line;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        char[] delimiter = { ',' };
-                        string[] result = line.Split(delimiter);
-                        for (int i = 0; i < players.Length; i++)
-                        {
-                            using (StreamWriter sw = new StreamWriter(file))
-                            {
-                                if (players[i] != null && players[i].username == username)
-                                {
-                                    sw.WriteLine($"{players[i].id}, {players[i].username},{players[i].highScore},{players[i].hoursPlayed}");
-                                }
-                                else
-                                {
-                                    sw.WriteLine(line);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
             
-        }
+            
+        
         class Player
         {
             public int hoursPlayed { get; private set; }
@@ -146,11 +116,18 @@ namespace Assignment
 
             }
 
+            public Player(string username)
+            {
+                hoursPlayed = 0;
+                highScore = 0;
+                this.username = username;
+            }
+                
             public void UpdateHighScore()
             {
                 Console.WriteLine("Enter new high score");
                 highScore =  Convert.ToInt32(Console.ReadLine());
-                FileHandler.UpdatePlayer("Record.txt", players, username);
+              
 
 
 
@@ -164,38 +141,26 @@ namespace Assignment
             }
         }
 
-        class PlayerArray
+         class PlayerList
         {
 
-            public void AddPlayer( Player[] players, string file)
+
+            public void AddPlayer(List<Player> players, string file)
             {
                Console.WriteLine("Enter username");
                 string username = Console.ReadLine();
 
-                for (int i = 1; i < players.Length; i++)
-                {
-                    if (players[i] == null)
-                    {
-                        string id = i.ToString();
-                        players[i] = new Player(id,username);
-                        using (StreamWriter sw = new StreamWriter(file,true))
-                        {
-                            sw.WriteLine($"{players[i].id}, {players[i].username},{players[i].highScore},{players[i].hoursPlayed}");
-                            sw.Close();
-                        }
-                        break;
+                players.Add(new Player(username));
 
-                    }
-                    else 
-                    {
-                        Console.WriteLine("Full");
-                    }
-                }
-           
-            
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(players, options);
+                File.WriteAllText(file, json);
+
+
+
             }
 
-            public void SearchArray(Player[] players)
+            public void SearchArray(List<Player> players)
             {
                 Console.WriteLine("Enter 1:id or 2:username");
                 int choice = Convert.ToInt32(Console.ReadLine());
@@ -210,7 +175,7 @@ namespace Assignment
                                                               
             }
 
-            public void SearchByID(Player[] players)
+            public void SearchByID(List<Player> players)
             {
                 Console.WriteLine("Enter ID");
                 int checkID = Convert.ToInt32(Console.ReadLine());
@@ -228,7 +193,7 @@ namespace Assignment
                 }
             }
 
-            public void SearchByUsername(Player[] players)
+            public void SearchByUsername(List<Player> players)
             {
                 Console.WriteLine("Enter username");
                 string checkUsername = Console.ReadLine();
@@ -245,7 +210,7 @@ namespace Assignment
                 }
             }
 
-            public void PrintArray(Player[] players,string file)
+            public void PrintArray(List<Player> players, string file)
             {
                 foreach (Player player in players)
                 {
