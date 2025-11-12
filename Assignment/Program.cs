@@ -25,8 +25,9 @@ namespace Assignment
 
 
 
+            try
+            {
 
-            
                 if (File.Exists("Record.json"))
                 {
                     string json = File.ReadAllText(file);
@@ -34,15 +35,16 @@ namespace Assignment
                     Console.WriteLine("File loaded successfully.");
 
                 }
+            }
+            catch(Exception e)
+            {
+                players = new List<Player>();
+            }
                
             
             
 
 
-            foreach (Player p in players)
-            {
-                Console.WriteLine(p);
-            }
 
 
 
@@ -78,13 +80,17 @@ namespace Assignment
 
         }
 
-        
-           
 
-            
-            
         
-        class Player
+        
+
+
+
+
+
+
+
+        class Player : IComparable<Player>
         {
             public int hoursPlayed { get; private set; }
             public int highScore { get; private set; }
@@ -121,15 +127,9 @@ namespace Assignment
 
             public Player() { }
                 
-            public void UpdateHighScore()
+            public int CompareTo(Player other)
             {
-                Console.WriteLine("Enter new high score");
-                highScore =  Convert.ToInt32(Console.ReadLine());
-              
-
-
-
-
+                return this.id.CompareTo(other.id);
             }
 
 
@@ -139,16 +139,42 @@ namespace Assignment
             }
         }
 
-         class PlayerList
+         class PlayerList 
         {
 
+            
 
             public void AddPlayer(List<Player> players, string file)
             {
                Console.WriteLine("Enter username");
                 string username = Console.ReadLine();
+                Console.WriteLine("Enter ID");
+                string id = Console.ReadLine();
+                players.Sort();
+                int found = -1;
+                foreach (Player p in players) {
+                    if (p.id == id)
+                    {
+                        found = 1;
+                        break;
+                    }
+                }
+                if(found == 1)
+                    {
+                        Console.WriteLine("Player with this ID already exists.");
+                        return;
+                    }
+                
+                else if (found == -1)
+                {
+                    players.Add(new Player(id, username));
+                }
 
-                players.Add(new Player(username));
+
+
+
+
+                   
 
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 string json = JsonSerializer.Serialize(players, options);
@@ -182,7 +208,7 @@ namespace Assignment
                     if (player != null && Convert.ToInt32(player.id) == checkID)
                     {
                         Console.WriteLine(player);
-                        player.UpdateHighScore();
+                     
                     }
                     else
                     {
