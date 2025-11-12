@@ -26,21 +26,17 @@ namespace Assignment
 
 
 
-            try
-            {
-                if (File.Exists(file))
+            
+                if (File.Exists("Record.json"))
                 {
                     string json = File.ReadAllText(file);
                     players = JsonSerializer.Deserialize<List<Player>>(json);
-                   
+                    Console.WriteLine("File loaded successfully.");
+
                 }
                
-            }
-            catch (Exception ex)
-            {
-               
-                players = new List<Player>();
-            }
+            
+            
 
 
             foreach (Player p in players)
@@ -122,6 +118,8 @@ namespace Assignment
                 highScore = 0;
                 this.username = username;
             }
+
+            public Player() { }
                 
             public void UpdateHighScore()
             {
