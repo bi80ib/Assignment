@@ -85,9 +85,43 @@ namespace Assignment
 
         }
 
+        static void MergeSort(List<Player> players)
+        {
+            if (players.Count <= 1)
+                return;
+            int mid = players.Count / 2;
+            List<Player> left = players.GetRange(0, mid);
+            List<Player> right = players.GetRange(mid, players.Count - mid);
+            MergeSort(left);
+            MergeSort(right);
+            Merge(players, left, right);
+        }
 
-        
-        
+        static void Merge(List<Player> players, List<Player> left, List<Player> right)
+        {
+            int i = 0, j = 0, k = 0;
+            while (i < left.Count && j > right.Count)
+            {
+                if (left[i].highScore.CompareTo(right[j].highScore) <= 0)
+                {
+                    players[k++] = left[i++];
+                }
+                else
+                {
+                    players[k++] = right[j++];
+                }
+            }
+            while (i < left.Count)
+            {
+                players[k++] = left[i++];
+            }
+            while (j < right.Count)
+            {
+                players[k++] = right[j++];
+            }
+        }
+
+
 
 
 
@@ -200,6 +234,9 @@ namespace Assignment
                         Console.WriteLine("Enter new HighScore");
                         int highscore = Convert.ToInt32(Console.ReadLine());
                         player.highScore = highscore;
+                        Console.WriteLine("Enter how many hours played");
+                        int hoursplayed = Convert.ToInt32(Console.ReadLine());
+                        player.hoursPlayed = hoursplayed;
                         break;
                     }
                 }
@@ -260,6 +297,8 @@ namespace Assignment
 
             public void PrintArray(List<Player> players, string file)
             {
+                MergeSort(players);
+
                 foreach (Player player in players)
                 {
                     if (player != null)
