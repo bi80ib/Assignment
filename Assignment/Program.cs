@@ -55,7 +55,8 @@ namespace Assignment
             {
                 Console.WriteLine("1 : Add Player");
                 Console.WriteLine("2 : Search Player");
-                Console.WriteLine("3 : Show all Players");
+                Console.WriteLine("3 : Update Player");
+                Console.WriteLine("4 : Show all Players");
                 int choice = Convert.ToInt32(Console.ReadLine());
                 if (choice == 1)
                 {
@@ -63,9 +64,13 @@ namespace Assignment
                 }
                 else if (choice == 2)
                 {
-                    a1.SearchArray(players);
+                    a1.SearchList(players);
                 }
-                else if (choice == 3)
+                else if( choice == 3)
+                {
+                    a1.UpdatePlayer(players, file);
+                }
+                else if (choice == 4)
                 {
                     a1.PrintArray(players, file);
                 }
@@ -92,8 +97,8 @@ namespace Assignment
 
         class Player : IComparable<Player>
         {
-            public int hoursPlayed { get; private set; }
-            public int highScore { get; private set; }
+            public int hoursPlayed { get; set; }
+            public int highScore { get; set; }
 
             public string id { get; set;}
 
@@ -184,7 +189,26 @@ namespace Assignment
 
             }
 
-            public void SearchArray(List<Player> players)
+            public void UpdatePlayer(List<Player> players, string file)
+            {
+                Console.WriteLine("Enter ID of player to update");
+                string id = Console.ReadLine();
+                foreach (Player player in players)
+                {
+                    if (player.id == id)
+                    {
+                        Console.WriteLine("Enter new HighScore");
+                        int highscore = Convert.ToInt32(Console.ReadLine());
+                        player.highScore = highscore;
+                        break;
+                    }
+                }
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(players, options);
+                File.WriteAllText(file, json);
+            }
+
+            public void SearchList(List<Player> players)
             {
                 Console.WriteLine("Enter 1:id or 2:username");
                 int choice = Convert.ToInt32(Console.ReadLine());
