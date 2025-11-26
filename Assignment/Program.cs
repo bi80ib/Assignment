@@ -58,6 +58,7 @@ namespace Assignment
                 Console.WriteLine("3 : Update Player");
                 Console.WriteLine("4 : Show all Players");
                 int choice = Convert.ToInt32(Console.ReadLine());
+                Console.Clear();
                 if (choice == 1)
                 {
                     a1.AddPlayer(players,file);
@@ -94,15 +95,10 @@ namespace Assignment
             List<Player> right = players.GetRange(mid, players.Count - mid);
             MergeSort(left);
             MergeSort(right);
-            Merge(players, left, right);
-        }
-
-        static void Merge(List<Player> players, List<Player> left, List<Player> right)
-        {
             int i = 0, j = 0, k = 0;
-            while (i < left.Count && j > right.Count)
+            while (i < left.Count && j < right.Count)
             {
-                if (left[i].highScore.CompareTo(right[j].highScore) <= 0)
+                if (left[i].highScore >= right[j].highScore)
                 {
                     players[k++] = left[i++];
                 }
@@ -120,7 +116,6 @@ namespace Assignment
                 players[k++] = right[j++];
             }
         }
-
 
 
 
