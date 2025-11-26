@@ -33,16 +33,16 @@ namespace Assignment
                     string json = File.ReadAllText(file);
                     players = JsonSerializer.Deserialize<List<Player>>(json);
                     Console.WriteLine("File loaded successfully.");
-
+                    Logger.GetInstance().Log("File Loaded");
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 players = new List<Player>();
             }
-               
-            
-            
+
+
+
 
 
 
@@ -61,13 +61,13 @@ namespace Assignment
                 Console.Clear();
                 if (choice == 1)
                 {
-                    a1.AddPlayer(players,file);
+                    a1.AddPlayer(players, file);
                 }
                 else if (choice == 2)
                 {
                     a1.SearchList(players);
                 }
-                else if( choice == 3)
+                else if (choice == 3)
                 {
                     a1.UpdatePlayer(players, file);
                 }
@@ -81,7 +81,7 @@ namespace Assignment
 
 
 
-             
+
 
 
         }
@@ -129,7 +129,7 @@ namespace Assignment
             public int hoursPlayed { get; set; }
             public int highScore { get; set; }
 
-            public string id { get; set;}
+            public string id { get; set; }
 
             public string username { get; set; }
 
@@ -139,10 +139,10 @@ namespace Assignment
                 this.username = username;
                 this.hoursPlayed = hoursPlayed;
                 this.highScore = highScore;
-               
+
             }
 
-            public Player(string id,string username)
+            public Player(string id, string username)
             {
                 hoursPlayed = 0;
                 highScore = 0;
@@ -160,7 +160,7 @@ namespace Assignment
             }
 
             public Player() { }
-                
+
             public int CompareTo(Player other)
             {
                 return this.id.CompareTo(other.id);
@@ -173,32 +173,33 @@ namespace Assignment
             }
         }
 
-         class PlayerList 
+        class PlayerList
         {
 
-            
+
 
             public void AddPlayer(List<Player> players, string file)
             {
-               Console.WriteLine("Enter username");
+                Console.WriteLine("Enter username");
                 string username = Console.ReadLine();
                 Console.WriteLine("Enter ID");
                 string id = Console.ReadLine();
                 players.Sort();
                 int found = -1;
-                foreach (Player p in players) {
+                foreach (Player p in players)
+                {
                     if (p.id == id)
                     {
                         found = 1;
                         break;
                     }
                 }
-                if(found == 1)
-                    {
-                        Console.WriteLine("Player with this ID already exists.");
-                        return;
-                    }
-                
+                if (found == 1)
+                {
+                    Console.WriteLine("Player with this ID already exists.");
+                    return;
+                }
+
                 else if (found == -1)
                 {
                     players.Add(new Player(id, username));
@@ -208,7 +209,7 @@ namespace Assignment
 
 
 
-                   
+
 
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 string json = JsonSerializer.Serialize(players, options);
@@ -244,7 +245,7 @@ namespace Assignment
             {
                 Console.WriteLine("Enter 1:id or 2:username");
                 int choice = Convert.ToInt32(Console.ReadLine());
-                if(choice == 1)
+                if (choice == 1)
                 {
                     SearchByID(players);
                 }
@@ -252,7 +253,7 @@ namespace Assignment
                 {
                     SearchByUsername(players);
                 }
-                                                              
+
             }
 
             public void SearchByID(List<Player> players)
@@ -264,7 +265,7 @@ namespace Assignment
                     if (player != null && Convert.ToInt32(player.id) == checkID)
                     {
                         Console.WriteLine(player);
-                     
+
                     }
                     else
                     {
@@ -299,7 +300,7 @@ namespace Assignment
                     if (player != null)
                     {
                         Console.WriteLine(player);
-                        
+
 
                     }
                 }
@@ -307,6 +308,29 @@ namespace Assignment
 
 
 
+
+        }
+
+        public class Logger
+        {
+            private static Logger instance;
+            private static string logFile = "log.txt";
+            private Logger() { }
+            public static Logger GetInstance()
+            {
+                if (instance == null)
+                {
+                    instance = new Logger();
+                }
+                return instance;
+            }
+            public void Log(string message)
+            {
+               string entry = ($"Log: {message},{DateTime.Now.ToString("HH,mm,ss")}");
+                
+                File.AppendAllText(logFile, entry + " \n");
+
+            }
 
         }
     }
