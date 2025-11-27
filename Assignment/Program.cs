@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Deployment.Internal;
+using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 
 
@@ -57,33 +58,52 @@ namespace Assignment
                 Console.WriteLine("2 : Search Player");
                 Console.WriteLine("3 : Update Player");
                 Console.WriteLine("4 : Show all Players");
-                int choice = Convert.ToInt32(Console.ReadLine());
-                Console.Clear();
-                if (choice == 1)
+                try
                 {
-                    a1.AddPlayer(players, file);
+                    int choice = Convert.ToInt32(Console.ReadLine());
+                    if (choice < 1 || choice > 4)
+                    {
+                        throw new OutofRange("Please enter between 1 and 4");
+                    }
+
+                    Console.Clear();
+                    if (choice == 1)
+                    {
+                        a1.AddPlayer(players, file);
+                    }
+                    else if (choice == 2)
+                    {
+                        a1.SearchList(players);
+                    }
+                    else if (choice == 3)
+                    {
+                        a1.UpdatePlayer(players, file);
+                    }
+                    else if (choice == 4)
+                    {
+                        a1.PrintArray(players, file);
+                    }
                 }
-                else if (choice == 2)
+                catch (FormatException e)
                 {
-                    a1.SearchList(players);
+                    Console.WriteLine("Please enter numerical value");
                 }
-                else if (choice == 3)
+                catch (OutofRange e)
                 {
-                    a1.UpdatePlayer(players, file);
+                    Console.WriteLine(e.Message);
                 }
-                else if (choice == 4)
+                catch (Exception e)
                 {
-                    a1.PrintArray(players, file);
+                    Console.WriteLine("An error occurred: " + e.Message);
                 }
+
+
+
+
+
+
 
             }
-
-
-
-
-
-
-
         }
 
         static void MergeSort(List<Player> players)
@@ -203,6 +223,7 @@ namespace Assignment
                 else if (found == -1)
                 {
                     players.Add(new Player(id, username));
+                    Logger.GetInstance().Log($"Player {id} added to list");
                 }
 
 
@@ -227,12 +248,41 @@ namespace Assignment
                 {
                     if (player.id == id)
                     {
-                        Console.WriteLine("Enter new HighScore");
-                        int highscore = Convert.ToInt32(Console.ReadLine());
-                        player.highScore = highscore;
-                        Console.WriteLine("Enter how many hours played");
-                        int hoursplayed = Convert.ToInt32(Console.ReadLine());
-                        player.hoursPlayed = hoursplayed;
+                        try
+                        {
+                            Console.WriteLine("Enter new HighScore");
+                            int highscore = Convert.ToInt32(Console.ReadLine());
+                            player.highScore = highscore;
+                            Console.WriteLine("Enter how many hours played");
+                            int hoursplayed = Convert.ToInt32(Console.ReadLine());
+                            player.hoursPlayed = hoursplayed;
+                            if(hoursplayed < 0 || highscore < 0)
+                            {
+                                throw new OutofRange("Values cannot be negative");
+                            }
+                        }
+                        catch (FormatException e)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Invalid input. Please enter numeric values for High Score and Hours Played.");
+                            UpdatePlayer(players, file);
+                            return;
+                        }
+                        catch (OutofRange e)
+                        {
+                            Console.Clear();
+                            Console.WriteLine(e.Message);
+                            UpdatePlayer(players, file);
+                            return;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("An error occurred: " + e.Message);
+                            UpdatePlayer(players, file);
+                            return;
+                        }
+                        Logger.GetInstance().Log($"High Score and Hours Played Updatetd for player {id}");
                         break;
                     }
                 }
@@ -244,15 +294,42 @@ namespace Assignment
             public void SearchList(List<Player> players)
             {
                 Console.WriteLine("Enter 1:id or 2:username");
-                int choice = Convert.ToInt32(Console.ReadLine());
-                if (choice == 1)
+               
+                try
                 {
-                    SearchByID(players);
+                    int choice = Convert.ToInt32(Console.ReadLine());
+                    if(choice < 1 || choice > 2)
+                    {
+                        throw new OutofRange("Please enter 1 or 2");
+                    }
+                    if (choice == 1)
+                    {
+                        SearchByID(players);
+                    }
+                    else if (choice == 2)
+                    {
+                        SearchByUsername(players);
+                    }
                 }
-                else if (choice == 2)
+                catch (FormatException e)
                 {
-                    SearchByUsername(players);
+                    Console.WriteLine("Please enter numerical value");
+                    SearchList(players);
+                    return;
                 }
+                catch (OutofRange e)
+                {
+                    Console.WriteLine(e.Message);
+                    SearchList(players);
+                    return;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("An error occurred: " + e.Message);
+                    SearchList(players);
+                    return;
+                }
+
 
             }
 
@@ -260,24 +337,27 @@ namespace Assignment
             {
                 Console.WriteLine("Enter ID");
                 int checkID = Convert.ToInt32(Console.ReadLine());
+                Logger.GetInstance().Log($"Player {checkID} searched by ID");
                 foreach (Player player in players)
                 {
-                    if (player != null && Convert.ToInt32(player.id) == checkID)
+                    if (Convert.ToInt32(player.id) == checkID)
                     {
                         Console.WriteLine(player);
+                        return;
+
 
                     }
-                    else
-                    {
-                        Console.WriteLine("Not found");
-                    }
+                    
                 }
+                Console.WriteLine("Not found");
+
             }
 
             public void SearchByUsername(List<Player> players)
             {
                 Console.WriteLine("Enter username");
                 string checkUsername = Console.ReadLine();
+                Logger.GetInstance().Log($"Player {checkUsername} searched by username");
                 foreach (Player player in players)
                 {
                     if (player != null && player.username == checkUsername)
@@ -326,12 +406,19 @@ namespace Assignment
             }
             public void Log(string message)
             {
-               string entry = ($"Log: {message},{DateTime.Now.ToString("HH,mm,ss")}");
-                
+                string entry = ($"Log: {message},{DateTime.Now.ToString("HH,mm,ss")}");
+
                 File.AppendAllText(logFile, entry + " \n");
 
             }
 
+        }
+
+        public class OutofRange : Exception
+        {
+            public OutofRange(string message) : base(message)
+            {
+            }
         }
     }
 }
