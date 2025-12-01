@@ -152,17 +152,37 @@ namespace Assignment
         }
 
 
+        public abstract class User
+        {
+            public string id { get; set; }
+            public string username { get; set; }
+            public User(string id, string username)
+            {
+                this.id = id;
+                this.username = username;
+            }
+            
+            public User() { }
+
+            public override string ToString()
+            {
+                return $"ID: {id}, Username: {username}";
+            }
 
 
 
-        class Player : IComparable<Player>
+
+
+
+        }
+
+
+        class Player : User, IComparable<Player>
         {
             public int hoursPlayed { get; set; }
             public int highScore { get; set; }
 
-            public string id { get; set; }
-
-            public string username { get; set; }
+            
 
             public Player(string id, string username, int highScore, int hoursPlayed)
             {
@@ -198,9 +218,20 @@ namespace Assignment
             }
 
 
+           
+        }
+
+        class PremiumPlayer : Player
+        {
+            public string subscriptionType { get; set; }
+            public PremiumPlayer(string id, string username, int highScore, int hoursPlayed, string subscriptionType)
+                : base(id, username, highScore, hoursPlayed)
+            {
+                this.subscriptionType = subscriptionType;
+            }
             public override string ToString()
             {
-                return $"ID: {id}, Username: {username}, Hours Played: {hoursPlayed}, High Score: {highScore}";
+                return base.ToString() + $", Subscription Type: {subscriptionType}";
             }
         }
 
