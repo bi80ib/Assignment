@@ -20,7 +20,7 @@ namespace Assignment
         {
 
             List<Player> players = new List<Player>();
-            PlayerList a1 = new PlayerList();
+            IPlayerService playerService = new PlayerList();
             string file = "Record.json";
 
 
@@ -69,19 +69,19 @@ namespace Assignment
                     Console.Clear();
                     if (choice == 1)
                     {
-                        a1.AddPlayer(players, file);
+                        playerService.AddPlayer(players, file);
                     }
                     else if (choice == 2)
                     {
-                        a1.SearchList(players);
+                        playerService.SearchList(players);
                     }
                     else if (choice == 3)
                     {
-                        a1.UpdatePlayer(players, file);
+                        playerService.UpdatePlayer(players, file);
                     }
                     else if (choice == 4)
                     {
-                        a1.PrintArray(players, file);
+                        playerService.PrintArray(players, file);
                     }
                 }
                 catch (FormatException e)
@@ -105,6 +105,8 @@ namespace Assignment
 
             }
         }
+
+
 
         static void MergeSort(List<Player> players)
         {
@@ -139,6 +141,15 @@ namespace Assignment
 
 
 
+
+
+         interface IPlayerService
+        {
+            void AddPlayer(List<Player> players, string file);
+            void UpdatePlayer(List<Player> players, string file);
+            void SearchList(List<Player> players);
+            void PrintArray(List<Player> players, string file);
+        }
 
 
 
@@ -193,7 +204,7 @@ namespace Assignment
             }
         }
 
-        class PlayerList
+        class PlayerList : IPlayerService
         {
 
 
@@ -256,7 +267,7 @@ namespace Assignment
                             Console.WriteLine("Enter how many hours played");
                             int hoursplayed = Convert.ToInt32(Console.ReadLine());
                             player.hoursPlayed = hoursplayed;
-                            if(hoursplayed < 0 || highscore < 0)
+                            if (hoursplayed < 0 || highscore < 0)
                             {
                                 throw new OutofRange("Values cannot be negative");
                             }
@@ -294,11 +305,11 @@ namespace Assignment
             public void SearchList(List<Player> players)
             {
                 Console.WriteLine("Enter 1:id or 2:username");
-               
+
                 try
                 {
                     int choice = Convert.ToInt32(Console.ReadLine());
-                    if(choice < 1 || choice > 2)
+                    if (choice < 1 || choice > 2)
                     {
                         throw new OutofRange("Please enter 1 or 2");
                     }
@@ -336,22 +347,40 @@ namespace Assignment
             public void SearchByID(List<Player> players)
             {
                 Console.WriteLine("Enter ID");
-                int checkID = Convert.ToInt32(Console.ReadLine());
-                Logger.GetInstance().Log($"Player {checkID} searched by ID");
-                foreach (Player player in players)
+                try
                 {
-                    if (Convert.ToInt32(player.id) == checkID)
-                    {
-                        Console.WriteLine(player);
-                        return;
 
+                    int checkID = Convert.ToInt32(Console.ReadLine());
+
+                    Logger.GetInstance().Log($"Player {checkID} searched by ID");
+                    foreach (Player player in players)
+                    {
+                        if (Convert.ToInt32(player.id) == checkID)
+                        {
+                            Console.WriteLine(player);
+                            return;
+
+
+                        }
 
                     }
-                    
+                }
+                catch (FormatException e)
+                {
+                    Console.WriteLine("Please enter numerical value");
+                    SearchByID(players);
+                    return;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("An error occurred: " + e.Message);
+                    SearchByID(players);
+                    return;
                 }
                 Console.WriteLine("Not found");
-
             }
+
+            
 
             public void SearchByUsername(List<Player> players)
             {
@@ -422,3 +451,6 @@ namespace Assignment
         }
     }
 }
+    
+
+
