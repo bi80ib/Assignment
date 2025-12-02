@@ -30,17 +30,30 @@ namespace Assignment
             try
             {
 
-                if (File.Exists("Record.json"))
-                {
+                
+                
                     string json = File.ReadAllText(file);
                     players = JsonSerializer.Deserialize<List<Player>>(json);
                     Console.WriteLine("File loaded successfully.");
                     Logger.GetInstance().Log("File Loaded");
-                }
+                
+            }
+            catch (FileNotFoundException)
+            {
+               Logger.GetInstance().Log("File not found, starting with empty player list");
+                Console.WriteLine("File not found, starting with empty player list.");
+                File.WriteAllText(file, "[]");
+            }
+            catch(JsonException)
+            {
+                Logger.GetInstance().Log("Error reading file, starting with empty player list");
+                Console.WriteLine("Error reading file, starting with empty player list.");
+                File.WriteAllText(file, "[]");
             }
             catch (Exception e)
             {
-                players = new List<Player>();
+                Logger.GetInstance().Log($"An error occurred: {e.Message}");
+                Console.WriteLine("An error occurred: " + e.Message);
             }
 
 
