@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 
@@ -30,11 +31,10 @@ namespace Assignment
             try
             {
 
-                
-                
-                    string json = File.ReadAllText(file);
-                    players = JsonSerializer.Deserialize<List<Player>>(json);
-                    Console.WriteLine("File loaded successfully.");
+
+
+                JsonHelper.LoadFromFile<List<Player>>(file).ForEach(player => players.Add(player));
+                Console.WriteLine("File loaded successfully.");
                     Logger.GetInstance().Log("File Loaded");
                 
             }
@@ -44,7 +44,7 @@ namespace Assignment
                 Console.WriteLine("File not found, starting with empty player list.");
                 File.WriteAllText(file, "[]");
             }
-            catch(JsonException)
+            catch (JsonException)
             {
                 Logger.GetInstance().Log("Error reading file, starting with empty player list");
                 Console.WriteLine("Error reading file, starting with empty player list.");
@@ -52,7 +52,7 @@ namespace Assignment
             }
             catch (Exception e)
             {
-                Logger.GetInstance().Log($"An error occurred: {e.Message}");
+                Logger.GetInstance().Log("An error occurred: " + e.Message);
                 Console.WriteLine("An error occurred: " + e.Message);
             }
 
@@ -72,12 +72,13 @@ namespace Assignment
                 Console.WriteLine("2 : Search Player");
                 Console.WriteLine("3 : Update Player");
                 Console.WriteLine("4 : Show all Players");
+                Console.WriteLine("5 : Exit");
                 try
                 {
                     int choice = Convert.ToInt32(Console.ReadLine());
-                    if (choice < 1 || choice > 4)
+                    if (choice < 1 || choice > 5)
                     {
-                        throw new OutofRange("Please enter between 1 and 4");
+                        throw new OutofRange("Please enter between 1 and 5");
                     }
 
                     Console.Clear();
@@ -96,6 +97,10 @@ namespace Assignment
                     else if (choice == 4)
                     {
                         playerService.PrintArray(players, file);
+                    }
+                    else if (choice == 5)
+                    {
+                        repeat = 1;
                     }
                 }
                 catch (FormatException e)
@@ -346,9 +351,7 @@ namespace Assignment
 
 
 
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(players, options);
-                File.WriteAllText(file, json);
+                JsonHelper.SaveToFile(file, players);
 
 
 
@@ -400,9 +403,7 @@ namespace Assignment
                         break;
                     }
                 }
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(players, options);
-                File.WriteAllText(file, json);
+                JsonHelper.SaveToFile(file, players);
             }
 
             public void SearchList(List<Player> players)
@@ -498,6 +499,21 @@ namespace Assignment
 
 
 
+        }
+
+        public static class JsonHelper
+        {
+            public static void SaveToFile<T>(string filePath, T data)
+            {
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string json = JsonSerializer.Serialize(data, options);
+                File.WriteAllText(filePath, json);
+            }
+            public static T LoadFromFile<T>(string filePath)
+            {
+                string json = File.ReadAllText(filePath);
+                return JsonSerializer.Deserialize<T>(json);
+            }
         }
 
         public class Logger
