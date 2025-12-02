@@ -365,45 +365,50 @@ namespace Assignment
                 {
                     if (player.id == id)
                     {
-                        try
+                        while (true)
                         {
-                            Console.WriteLine("Enter new HighScore");
-                            int highscore = Convert.ToInt32(Console.ReadLine());
-                            player.highScore = highscore;
-                            Console.WriteLine("Enter how many hours played");
-                            int hoursplayed = Convert.ToInt32(Console.ReadLine());
-                            player.hoursPlayed = hoursplayed;
-                            if (hoursplayed < 0 || highscore < 0)
+                            try
                             {
-                                throw new OutofRange("Values cannot be negative");
+                                Console.WriteLine("Enter new HighScore");
+                                int highscore = Convert.ToInt32(Console.ReadLine());
+                                player.highScore = highscore;
+                                Console.WriteLine("Enter how many hours played");
+                                int hoursplayed = Convert.ToInt32(Console.ReadLine());
+                                player.hoursPlayed = hoursplayed;
+                                if (hoursplayed < 0 || highscore < 0)
+                                {
+                                    throw new OutofRange("Values cannot be negative");
+                                }
+                                Logger.GetInstance().Log($"High Score and Hours Played Updatetd for player {id}");
+                                break;
                             }
+                            catch (FormatException e)
+                            {
+                                Console.Clear();
+                                Console.WriteLine("Invalid input. Please enter numeric values for High Score and Hours Played.");
+
+                                return;
+                            }
+                            catch (OutofRange e)
+                            {
+                                Console.Clear();
+                                Console.WriteLine(e.Message);
+
+
+                            }
+                            catch (Exception e)
+                            {
+                                Console.Clear();
+                                Console.WriteLine("An error occurred: " + e.Message);
+
+                                
+                            }
+                            
                         }
-                        catch (FormatException e)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Invalid input. Please enter numeric values for High Score and Hours Played.");
-                            UpdatePlayer(players, file);
-                            return;
-                        }
-                        catch (OutofRange e)
-                        {
-                            Console.Clear();
-                            Console.WriteLine(e.Message);
-                            UpdatePlayer(players, file);
-                            return;
-                        }
-                        catch (Exception e)
-                        {
-                            Console.Clear();
-                            Console.WriteLine("An error occurred: " + e.Message);
-                            UpdatePlayer(players, file);
-                            return;
-                        }
-                        Logger.GetInstance().Log($"High Score and Hours Played Updatetd for player {id}");
-                        break;
                     }
                 }
-                JsonHelper.SaveToFile(file, players);
+                    JsonHelper.SaveToFile(file, players);
+                
             }
 
             public void SearchList(List<Player> players)
