@@ -4,6 +4,7 @@ using System.Deployment.Internal;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -139,11 +140,65 @@ namespace Assignment
             }
         }
 
+        static bool BinarySearchByUsername(List<Player> players, string username)
+        {
+            int left = 0;
+            int right = players.Count - 1;
+            while (left <= right)
+            {
+                int mid = left + (right - left) / 2;
+                int cmp = string.Compare(players[mid].username, username, StringComparison.OrdinalIgnoreCase);
+                if (cmp == 0)
+                {
+                    Console.WriteLine(players[mid]);
+                    return true;
+                }
+                if (cmp < 0)
+                {
+                    left = mid + 1;
+                }
+                else
+                {
+                    right = mid - 1;
+                }
+            }
+            return false;
+        }
+
+            static bool BinarySearchById(List<Player> players, string Id)
+        {
+            int left = 0;
+            int right = players.Count - 1;
+            while (left <= right)
+            {
+                int mid = left + (right - left) / 2;
+                int cmp = string.Compare(players[mid].id, Id, StringComparison.OrdinalIgnoreCase);
+                if (cmp == 0)
+                {
+                    Console.WriteLine(players[mid]);
+                    return true;
+                }
+                if (cmp < 0)
+                {
+                    left = mid + 1;
+                }
+                else
+                {
+                    right = mid - 1;
+                }
+            }
+            return false;        
+        }
 
 
 
 
-         interface IPlayerService
+
+
+
+
+
+        interface IPlayerService
         {
             void AddPlayer(List<Player> players, string file);
             void UpdatePlayer(List<Player> players, string file);
@@ -217,8 +272,12 @@ namespace Assignment
                 return this.id.CompareTo(other.id);
             }
 
+            public override string ToString()
+            {
+                return base.ToString() + $", High Score: {highScore}, Hours Played: {hoursPlayed}";
+            }
 
-           
+
         }
 
         class PremiumPlayer : Player
@@ -237,7 +296,7 @@ namespace Assignment
 
         class PlayerList : IPlayerService
         {
-
+            
 
 
             public void AddPlayer(List<Player> players, string file)
@@ -378,37 +437,18 @@ namespace Assignment
             public void SearchByID(List<Player> players)
             {
                 Console.WriteLine("Enter ID");
-                try
-                {
+               
 
-                    int checkID = Convert.ToInt32(Console.ReadLine());
+                    string checkID = Console.ReadLine();
 
                     Logger.GetInstance().Log($"Player {checkID} searched by ID");
-                    foreach (Player player in players)
+                    MergeSort(players);
+                    if (!BinarySearchById(players, checkID))
                     {
-                        if (Convert.ToInt32(player.id) == checkID)
-                        {
-                            Console.WriteLine(player);
-                            return;
-
-
-                        }
-
+                        Console.WriteLine("Not found");
                     }
-                }
-                catch (FormatException e)
-                {
-                    Console.WriteLine("Please enter numerical value");
-                    SearchByID(players);
-                    return;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("An error occurred: " + e.Message);
-                    SearchByID(players);
-                    return;
-                }
-                Console.WriteLine("Not found");
+                
+               
             }
 
             
@@ -418,17 +458,13 @@ namespace Assignment
                 Console.WriteLine("Enter username");
                 string checkUsername = Console.ReadLine();
                 Logger.GetInstance().Log($"Player {checkUsername} searched by username");
-                foreach (Player player in players)
+                MergeSort(players);
+                if(!BinarySearchByUsername(players, checkUsername))
                 {
-                    if (player != null && player.username == checkUsername)
-                    {
-                        Console.WriteLine(player);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Not found");
-                    }
+                    Console.WriteLine("Not found");
                 }
+
+
             }
 
             public void PrintArray(List<Player> players, string file)
