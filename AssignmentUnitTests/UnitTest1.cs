@@ -27,7 +27,7 @@ namespace AssignmentUnitTests
             var playerList = new PlayerList();
             String file = "Record.json";
 
-            Console.SetIn(new System.IO.StringReader("testuser\n1\n"));
+            Console.SetIn(new StringReader("testuser\n1\n"));
 
             playerList.AddPlayer(players, file);
             Assert.AreEqual(1, players.Count);
@@ -44,10 +44,10 @@ namespace AssignmentUnitTests
             var playerList = new PlayerList();
             String file = "Record.json";
             players.Add(new Player { id = "1", username = "existinguser" });
-            Console.SetIn(new System.IO.StringReader("newuser\n1\n"));
+            Console.SetIn(new StringReader("newuser\n1\n"));
             playerList.AddPlayer(players, file);
             Assert.AreEqual(1, players.Count);
-            Assert.AreEqual("1", players[0].id);
+            Assert.AreEqual("existinguser", players[0].username);
         }
 
         [TestMethod]
@@ -59,10 +59,10 @@ namespace AssignmentUnitTests
             String file = "Record.json";
 
             players.Add(new Player { id = "1", username = "John" });
-            Console.SetIn(new System.IO.StringReader("45\n67\n"));
+            Console.SetIn(new StringReader("1\n45\n67\n"));
             playerList.UpdatePlayer(players, file);
-            Assert.AreEqual("45", players[0].highScore);
-            Assert.AreEqual("67", players[0].hoursPlayed);
+            Assert.AreEqual(45, players[0].highScore);
+            Assert.AreEqual(67, players[0].hoursPlayed);
 
 
 
@@ -75,9 +75,10 @@ namespace AssignmentUnitTests
             var players = new List<Player>();
             var playerList = new PlayerList();
             
-            Console.SetIn(new System.IO.StringReader("5\n"));
+            Console.SetIn(new StringReader("5\n1\n1"));
             
-            Assert.ThrowsException<ArgumentOutOfRangeException>(() => playerList.SearchList(players));
+            Assert.ThrowsException<OutofRange>(() => playerList.SearchList(players));
+
 
 
 
@@ -94,7 +95,7 @@ namespace AssignmentUnitTests
         public void LoadFromFile_MalformedData_JsonException()
         {
             string file = "MalformedRecord.json";
-            File.WriteAllText(file, "{ invalid json }");
+            File.WriteAllText(file, " invalid json ");
             Assert.ThrowsException<JsonException>(() => JsonHelper.LoadFromFile<object>(file));
 
         }

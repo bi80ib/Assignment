@@ -29,33 +29,31 @@ namespace Assignment
 
 
 
-            try
+
+
+
+
+            var loadedPlayers = JsonHelper.LoadFromFile<List<Player>>(file);
+                if (loadedPlayers != null)
             {
-
-
-
-                JsonHelper.LoadFromFile<List<Player>>(file).ForEach(player => players.Add(player));
+                loadedPlayers.ForEach
+                (player => players.Add(player));
                 Console.WriteLine("File loaded successfully.");
                 Logger.GetInstance().Log("File Loaded");
 
             }
-            catch (FileNotFoundException)
-            {
-                Logger.GetInstance().Log("File not found, starting with empty player list");
-                Console.WriteLine("File not found, starting with empty player list.");
-                File.WriteAllText(file, "[]");
+            else {
+
+                Console.WriteLine("No existing data found. Starting with an empty player list.");
+                Logger.GetInstance().Log("No existing data found. Starting with an empty player list.");
+
             }
-            catch (JsonException)
-            {
-                Logger.GetInstance().Log("Error reading file, starting with empty player list");
-                Console.WriteLine("Error reading file, starting with empty player list.");
-                File.WriteAllText(file, "[]");
-            }
-            catch (Exception e)
-            {
-                Logger.GetInstance().Log("An error occurred: " + e.Message);
-                Console.WriteLine("An error occurred: " + e.Message);
-            }
+
+                
+
+            
+            
+            
 
 
 
@@ -335,10 +333,15 @@ namespace Assignment
 
             public void SearchList(List<Player> players)
             {
-                Console.WriteLine("Enter 1:id or 2:username");
+            while (true)
+            {
 
                 try
                 {
+
+                    Console.WriteLine("Enter 1:id or 2:username");
+
+
                     int choice = Convert.ToInt32(Console.ReadLine());
                     if (choice < 1 || choice > 2)
                     {
@@ -347,31 +350,32 @@ namespace Assignment
                     if (choice == 1)
                     {
                         SearchByID(players);
+                        break;
                     }
                     else if (choice == 2)
                     {
                         SearchByUsername(players);
+                        break;
                     }
+
+
                 }
+               
+
+
                 catch (FormatException e)
                 {
                     Console.WriteLine("Please enter numerical value");
-                    SearchList(players);
-                    return;
+
                 }
-                catch (OutofRange e)
-                {
-                    Console.WriteLine(e.Message);
-                    SearchList(players);
-                    return;
-                }
+
                 catch (Exception e)
                 {
                     Console.WriteLine("An error occurred: " + e.Message);
-                    SearchList(players);
-                    return;
-                }
 
+
+                }
+            }
 
             }
 
@@ -447,18 +451,23 @@ namespace Assignment
             {
                 Console.WriteLine("File not found: " + e.Message);
                 Logger.GetInstance().Log("File not found: " + e.Message);
+
+                File.WriteAllText("Record.Json", "[]");
                 return default(T);
+               
             }
             catch (JsonException e)
             {
                 Console.WriteLine("Error deserializing JSON: " + e.Message);
                 Logger.GetInstance().Log("Error deserializing JSON: " + e.Message);
+                File.WriteAllText("Record.Json", "[]");
                 return default(T);
             }
             catch (Exception e)
             {
                 Console.WriteLine("An error occurred: " + e.Message);
                 Logger.GetInstance().Log("An error occurred: " + e.Message);
+                File.WriteAllText("Record.Json", "[]");
                 return default(T);
             }
         }
