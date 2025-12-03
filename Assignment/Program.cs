@@ -21,8 +21,9 @@ namespace Assignment
         static void Main(string[] args)
         {
 
-            List<Player> players = new List<Player>();
+
             IPlayerService playerService = new PlayerList();
+            List<Player> players = new List<Player>();
             string file = "Record.json";
 
 
@@ -35,12 +36,12 @@ namespace Assignment
 
                 JsonHelper.LoadFromFile<List<Player>>(file).ForEach(player => players.Add(player));
                 Console.WriteLine("File loaded successfully.");
-                    Logger.GetInstance().Log("File Loaded");
-                
+                Logger.GetInstance().Log("File Loaded");
+
             }
             catch (FileNotFoundException)
             {
-               Logger.GetInstance().Log("File not found, starting with empty player list");
+                Logger.GetInstance().Log("File not found, starting with empty player list");
                 Console.WriteLine("File not found, starting with empty player list.");
                 File.WriteAllText(file, "[]");
             }
@@ -65,8 +66,8 @@ namespace Assignment
 
 
 
-            int repeat = 0;
-            while (repeat == 0)
+
+            while (true)
             {
                 Console.WriteLine("1 : Add Player");
                 Console.WriteLine("2 : Search Player");
@@ -100,7 +101,7 @@ namespace Assignment
                     }
                     else if (choice == 5)
                     {
-                        repeat = 1;
+                        break;
                     }
                 }
                 catch (FormatException e)
@@ -126,87 +127,8 @@ namespace Assignment
         }
 
 
-
-        static void MergeSort(List<Player> players)
-        {
-            if (players.Count <= 1)
-                return;
-            int mid = players.Count / 2;
-            List<Player> left = players.GetRange(0, mid);
-            List<Player> right = players.GetRange(mid, players.Count - mid);
-            MergeSort(left);
-            MergeSort(right);
-            int i = 0, j = 0, k = 0;
-            while (i < left.Count && j < right.Count)
-            {
-                if (left[i].highScore >= right[j].highScore)
-                {
-                    players[k++] = left[i++];
-                }
-                else
-                {
-                    players[k++] = right[j++];
-                }
-            }
-            while (i < left.Count)
-            {
-                players[k++] = left[i++];
-            }
-            while (j < right.Count)
-            {
-                players[k++] = right[j++];
-            }
-        }
-
-        static bool BinarySearchByUsername(List<Player> players, string username)
-        {
-            int left = 0;
-            int right = players.Count - 1;
-            while (left <= right)
-            {
-                int mid = left + (right - left) / 2;
-                int cmp = string.Compare(players[mid].username, username, StringComparison.OrdinalIgnoreCase);
-                if (cmp == 0)
-                {
-                    Console.WriteLine(players[mid]);
-                    return true;
-                }
-                if (cmp < 0)
-                {
-                    left = mid + 1;
-                }
-                else
-                {
-                    right = mid - 1;
-                }
-            }
-            return false;
-        }
-
-            static bool BinarySearchById(List<Player> players, string Id)
-        {
-            int left = 0;
-            int right = players.Count - 1;
-            while (left <= right)
-            {
-                int mid = left + (right - left) / 2;
-                int cmp = string.Compare(players[mid].id, Id, StringComparison.OrdinalIgnoreCase);
-                if (cmp == 0)
-                {
-                    Console.WriteLine(players[mid]);
-                    return true;
-                }
-                if (cmp < 0)
-                {
-                    left = mid + 1;
-                }
-                else
-                {
-                    right = mid - 1;
-                }
-            }
-            return false;        
-        }
+    }
+        
 
 
 
@@ -250,7 +172,7 @@ namespace Assignment
         }
 
 
-        class Player : User, IComparable<Player>
+        public class Player : User, IComparable<Player>
         {
             public int hoursPlayed { get; set; }
             public int highScore { get; set; }
@@ -298,7 +220,7 @@ namespace Assignment
 
         }
 
-        class PremiumPlayer : Player
+        public class PremiumPlayer : Player
         {
             public string subscriptionType { get; set; }
             public PremiumPlayer(string id, string username, int highScore, int hoursPlayed, string subscriptionType)
@@ -312,10 +234,10 @@ namespace Assignment
             }
         }
 
-        class PlayerList : IPlayerService
+        public class PlayerList : IPlayerService
         {
-            
 
+            
 
             public void AddPlayer(List<Player> players, string file)
             {
@@ -461,8 +383,8 @@ namespace Assignment
                     string checkID = Console.ReadLine();
 
                     Logger.GetInstance().Log($"Player {checkID} searched by ID");
-                    MergeSort(players);
-                    if (!BinarySearchById(players, checkID))
+                    SearchandSortHelper.MergeSortbyHighscoreDesc(players);
+                if (!SearchandSortHelper.BinarySearchById(players, checkID))
                     {
                         Console.WriteLine("Not found");
                     }
@@ -477,8 +399,8 @@ namespace Assignment
                 Console.WriteLine("Enter username");
                 string checkUsername = Console.ReadLine();
                 Logger.GetInstance().Log($"Player {checkUsername} searched by username");
-                MergeSort(players);
-                if(!BinarySearchByUsername(players, checkUsername))
+                SearchandSortHelper.MergeSortbyHighscoreDesc(players);
+                if (!SearchandSortHelper.BinarySearchByUsername(players, checkUsername))
                 {
                     Console.WriteLine("Not found");
                 }
@@ -488,7 +410,7 @@ namespace Assignment
 
             public void PrintArray(List<Player> players, string file)
             {
-                MergeSort(players);
+                SearchandSortHelper.MergeSortbyHighscoreDesc(players);
 
                 foreach (Player player in players)
                 {
@@ -506,19 +428,124 @@ namespace Assignment
 
         }
 
-        public static class JsonHelper
+    public static class JsonHelper
+    {
+        public static void SaveToFile<T>(string filePath, T data)
         {
-            public static void SaveToFile<T>(string filePath, T data)
-            {
-                var options = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(data, options);
-                File.WriteAllText(filePath, json);
-            }
-            public static T LoadFromFile<T>(string filePath)
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(data, options);
+            File.WriteAllText(filePath, json);
+        }
+        public static T LoadFromFile<T>(string filePath)
+        {
+            try
             {
                 string json = File.ReadAllText(filePath);
                 return JsonSerializer.Deserialize<T>(json);
             }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine("File not found: " + e.Message);
+                Logger.GetInstance().Log("File not found: " + e.Message);
+                return default(T);
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine("Error deserializing JSON: " + e.Message);
+                Logger.GetInstance().Log("Error deserializing JSON: " + e.Message);
+                return default(T);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("An error occurred: " + e.Message);
+                Logger.GetInstance().Log("An error occurred: " + e.Message);
+                return default(T);
+            }
+        }
+    }
+        public static class SearchandSortHelper
+        {
+            public static void MergeSortbyHighscoreDesc(List<Player> players)
+            {
+                if (players.Count <= 1)
+                    return;
+                int mid = players.Count / 2;
+                List<Player> left = players.GetRange(0, mid);
+                List<Player> right = players.GetRange(mid, players.Count - mid);
+                MergeSortbyHighscoreDesc(left);
+                MergeSortbyHighscoreDesc(right);
+                int i = 0, j = 0, k = 0;
+                while (i < left.Count && j < right.Count)
+                {
+                    if (left[i].highScore >= right[j].highScore)
+                    {
+                        players[k++] = left[i++];
+                    }
+                    else
+                    {
+                        players[k++] = right[j++];
+                    }
+                }
+                while (i < left.Count)
+                {
+                    players[k++] = left[i++];
+                }
+                while (j < right.Count)
+                {
+                    players[k++] = right[j++];
+                }
+            }
+
+            public static bool BinarySearchByUsername(List<Player> players, string username)
+            {
+                int left = 0;
+                int right = players.Count - 1;
+                while (left <= right)
+                {
+                    int mid = left + (right - left) / 2;
+                    int cmp = string.Compare(players[mid].username, username, StringComparison.OrdinalIgnoreCase);
+                    if (cmp == 0)
+                    {
+                        Console.WriteLine(players[mid]);
+                        return true;
+                    }
+                    if (cmp < 0)
+                    {
+                        left = mid + 1;
+                    }
+                    else
+                    {
+                        right = mid - 1;
+                    }
+                }
+                return false;
+            }
+
+            public static bool BinarySearchById(List<Player> players, string Id)
+            {
+                int left = 0;
+                int right = players.Count - 1;
+                while (left <= right)
+                {
+                    int mid = left + (right - left) / 2;
+                    int cmp = string.Compare(players[mid].id, Id, StringComparison.OrdinalIgnoreCase);
+                    if (cmp == 0)
+                    {
+                        Console.WriteLine(players[mid]);
+                        return true;
+                    }
+                    if (cmp < 0)
+                    {
+                        left = mid + 1;
+                    }
+                    else
+                    {
+                        right = mid - 1;
+                    }
+                }
+                return false;
+            }
+        }
         }
 
         public class Logger
@@ -550,8 +577,10 @@ namespace Assignment
             {
             }
         }
-    }
-}
+    
+
+
+
     
 
 
