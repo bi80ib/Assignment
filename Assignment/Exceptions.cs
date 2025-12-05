@@ -12,4 +12,11 @@ namespace Assignment
         {
         }
     }
+
+    public class InvalidInput : Exception
+    {
+        public InvalidInput(string message) : base(message)
+        {
+        }
+    }
 }

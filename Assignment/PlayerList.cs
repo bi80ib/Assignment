@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,37 +18,70 @@ namespace Assignment
             string username = Console.ReadLine();
             Console.WriteLine("Enter ID");
             string id = Console.ReadLine();
-            players.Sort();
-            int found = -1;
-            foreach (Player p in players)
+
+            while (true)
             {
-                if (p.id == id)
+                Console.WriteLine("Premium Player(y/n)?");
+                try
                 {
-                    found = 1;
-                    break;
+                    string premium = Console.ReadLine();
+                    if (premium.ToLower() != "y" && premium.ToLower() != "n")
+                    {
+                        throw new InvalidInput("Please enter y or n");
+                    }
+
+                    players.Sort();
+                    int found = -1;
+                    foreach (Player p in players)
+                    {
+                        if (p.id == id)
+                        {
+                            found = 1;
+                            break;
+                        }
+                    }
+                    if (found == 1)
+                    {
+                        Console.WriteLine("Player with this ID already exists.");
+                        return;
+                    }
+
+                    else if (found == -1)
+                    {
+                        if (premium.ToLower() == "y")
+                        {
+                            Console.WriteLine("Enter subscription type");
+                            string subscriptionType = Console.ReadLine();
+                            players.Add(new PremiumPlayer(id, username, subscriptionType));
+                            Logger.GetInstance().Log($"Premium Player {id} added to list");
+                            break;
+                        }
+
+                        else
+                        {
+                            players.Add(new Player(id, username));
+                            Logger.GetInstance().Log($"Player {id} added to list");
+                            break;
+                        }
+                    }
+
+                    JsonHelper.SaveToFile(file, players);
                 }
+
+                catch (InvalidInput e)
+                {
+                    Console.Clear();
+                    Console.WriteLine("An error occurred: " + e.Message);
+
+                }
+                catch (Exception e)
+                {
+                    Console.Clear();
+                    Console.WriteLine("An error occurred: " + e.Message);
+                }
+
+
             }
-            if (found == 1)
-            {
-                Console.WriteLine("Player with this ID already exists.");
-                return;
-            }
-
-            else if (found == -1)
-            {
-                players.Add(new Player(id, username));
-                Logger.GetInstance().Log($"Player {id} added to list");
-            }
-
-
-
-
-
-
-
-            JsonHelper.SaveToFile(file, players);
-
-
 
         }
 

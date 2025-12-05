@@ -55,12 +55,7 @@ namespace Assignment
 
         }
 
-        public Player(string username)
-        {
-            hoursPlayed = 0;
-            highScore = 0;
-            this.username = username;
-        }
+        
 
         public Player() { }
 
@@ -77,11 +72,20 @@ namespace Assignment
     public class PremiumPlayer : Player
     {
         public string subscriptionType { get; set; }
+
+        public PremiumPlayer(string id, string username,string subscriptionType)
+            : base(id, username)
+        {
+            this.subscriptionType = subscriptionType;
+        }
+
         public PremiumPlayer(string id, string username, int highScore, int hoursPlayed, string subscriptionType)
             : base(id, username, highScore, hoursPlayed)
         {
             this.subscriptionType = subscriptionType;
         }
+
+
         public override string ToString()
         {
             return base.ToString() + $", Subscription Type: {subscriptionType}";
