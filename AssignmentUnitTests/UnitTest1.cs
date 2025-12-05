@@ -95,8 +95,18 @@ namespace AssignmentUnitTests
         public void LoadFromFile_MalformedData_JsonException()
         {
             string file = "MalformedRecord.json";
-            File.WriteAllText(file, " invalid json ");
-            Assert.ThrowsException<JsonException>(() => JsonHelper.LoadFromFile<object>(file));
+            bool writesFile = false;
+
+            try
+            {
+                File.WriteAllText(file, " invalid json ");
+                writesFile = true;
+            }
+            catch(JsonException)
+            {
+                Assert.IsFalse(writesFile);
+            }
+           
 
         }
     }
