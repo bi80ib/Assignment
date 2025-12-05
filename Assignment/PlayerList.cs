@@ -192,18 +192,18 @@ namespace Assignment
 
             foreach (Player player in players)
             {
-                if (player != null)
-                {
-                    Console.WriteLine(player);
+
+                Console.WriteLine(player);
 
 
-                }
+
             }
         }
-
-
-
-
     }
 
 }
+
+    
+
+
+

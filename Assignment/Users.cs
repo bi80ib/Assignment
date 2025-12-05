@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assignment
 {
-    public abstract class User
+    public abstract class User : IComparable<User>
     {
         public string id { get; set; }
         public string username { get; set; }
@@ -18,13 +18,18 @@ namespace Assignment
 
         public User() { }
 
+        public int CompareTo(User other)
+        {
+            return this.id.CompareTo(other.id);
+        }
+
         public override string ToString()
         {
             return $"ID: {id}, Username: {username}";
         }
     }
 
-        public class Player : User, IComparable<Player>
+        public class Player : User
     {
         public int hoursPlayed { get; set; }
         public int highScore { get; set; }
@@ -59,10 +64,7 @@ namespace Assignment
 
         public Player() { }
 
-        public int CompareTo(Player other)
-        {
-            return this.id.CompareTo(other.id);
-        }
+       
 
         public override string ToString()
         {
