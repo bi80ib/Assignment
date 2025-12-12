@@ -81,6 +81,72 @@ namespace Assignment
             }
         }
 
+        public static void MergeSortbyId(List<Player> players)
+        {
+            if (players.Count <= 1)
+            {
+                return;
+            }
+            int mid = players.Count / 2;
+            List<Player> left = players.GetRange(0, mid);
+            List<Player> right = players.GetRange(mid, players.Count - mid);
+            MergeSortbyId(left);
+            MergeSortbyId(right);
+            int i = 0, j = 0, k = 0;
+            while (i < left.Count && j < right.Count)
+            {
+                if (string.Compare(left[i].id, right[j].id, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    players[k++] = left[i++];
+                }
+                else
+                {
+                    players[k++] = right[j++];
+                }
+            }
+            while (i < left.Count)
+            {
+                players[k++] = left[i++];
+            }
+            while (j < right.Count)
+            {
+                players[k++] = right[j++];
+            }
+        }
+
+        public static void MergeSortbyUsername(List<Player> players)
+        {
+            if (players.Count <= 1)
+            { 
+            return;
+            }
+            int mid = players.Count / 2;
+            List<Player> left = players.GetRange(0, mid);
+            List<Player> right = players.GetRange(mid, players.Count - mid);
+            MergeSortbyUsername(left);
+            MergeSortbyUsername(right);
+            int i = 0, j = 0, k = 0;
+            while (i < left.Count && j < right.Count)
+            {
+                if (string.Compare(left[i].username, right[j].username, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                    players[k++] = left[i++];
+                }
+                else
+                {
+                    players[k++] = right[j++];
+                }
+            }
+            while (i < left.Count)
+            {
+                players[k++] = left[i++];
+            }
+            while (j < right.Count)
+            {
+                players[k++] = right[j++];
+            }
+        }
+
         public static bool BinarySearchByUsername(List<Player> players, string username)
         {
             int left = 0;
@@ -94,7 +160,7 @@ namespace Assignment
                     Console.WriteLine(players[mid]);
                     return true;
                 }
-                if (cmp < 0)
+                if (cmp > 0)
                 {
                     left = mid + 1;
                 }
@@ -118,7 +184,7 @@ namespace Assignment
                     Console.WriteLine(players[mid]);
                     return true;
                 }
-                if (cmp < 0)
+                if (cmp > 0)
                 {
                     left = mid + 1;
                 }

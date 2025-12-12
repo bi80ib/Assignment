@@ -11,6 +11,6 @@ namespace Assignment
         void AddPlayer(List<Player> players, string file);
         void UpdatePlayer(List<Player> players, string file);
         void SearchList(List<Player> players);
-        void PrintList(List<Player> players, string file);
+        void PrintList(List<Player> players);
     }
 }

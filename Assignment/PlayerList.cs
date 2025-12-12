@@ -31,41 +31,45 @@ namespace Assignment
                     }
 
                     players.Sort();
-                    int found = -1;
+                    bool found = false;
                     foreach (Player p in players)
                     {
                         if (p.id == id)
                         {
-                            found = 1;
+                            found = true;
                             break;
                         }
                     }
-                    if (found == 1)
+                    if (found)
                     {
                         Console.WriteLine("Player with this ID already exists.");
                         return;
                     }
 
-                    else if (found == -1)
+                    else if (!found)
                     {
                         if (premium.ToLower() == "y")
                         {
                             Console.WriteLine("Enter subscription type");
                             string subscriptionType = Console.ReadLine();
                             players.Add(new PremiumPlayer(id, username, subscriptionType));
+                           
                             Logger.GetInstance().Log($"Premium Player {id} added to list");
-                            break;
+                          
                         }
 
                         else
                         {
                             players.Add(new Player(id, username));
                             Logger.GetInstance().Log($"Player {id} added to list");
-                            break;
+                            
                         }
+                        JsonHelper.SaveToFile(file, players);
+                        break;
+
                     }
 
-                    JsonHelper.SaveToFile(file, players);
+                    
                 }
 
                 catch (InvalidInput e)
@@ -99,16 +103,20 @@ namespace Assignment
                         {
                             Console.WriteLine("Enter new HighScore");
                             int highscore = Convert.ToInt32(Console.ReadLine());
-                            player.highScore = highscore;
+                            
                             Console.WriteLine("Enter how many hours played");
                             int hoursplayed = Convert.ToInt32(Console.ReadLine());
-                            player.hoursPlayed = hoursplayed;
+                            
                             if (hoursplayed < 0 || highscore < 0)
                             {
                                 throw new OutofRange("Values cannot be negative");
                             }
+                            player.hoursPlayed = hoursplayed;
+                            player.highScore = highscore;
                             Logger.GetInstance().Log($"High Score and Hours Played Updatetd for player {id}");
-                            break;
+                             Console.WriteLine("Player updated successfully");
+                            JsonHelper.SaveToFile(file, players);
+                            return;
                         }
                         catch (FormatException e)
                         {
@@ -134,8 +142,10 @@ namespace Assignment
 
                     }
                 }
+               
             }
-            JsonHelper.SaveToFile(file, players);
+            Console.WriteLine("Player not found");
+
 
         }
 
@@ -169,7 +179,10 @@ namespace Assignment
 
                 }
 
-
+                catch (OutofRange e)
+                {
+                    Console.WriteLine(e.Message);
+                }
 
                 catch (FormatException e)
                 {
@@ -195,7 +208,7 @@ namespace Assignment
             string checkID = Console.ReadLine();
 
             Logger.GetInstance().Log($"Player {checkID} searched by ID");
-            SearchandSortHelper.MergeSortbyHighscoreDesc(players);
+            SearchandSortHelper.MergeSortbyId(players);
             if (!SearchandSortHelper.BinarySearchById(players, checkID))
             {
                 Console.WriteLine("Not found");
@@ -211,7 +224,7 @@ namespace Assignment
             Console.WriteLine("Enter username");
             string checkUsername = Console.ReadLine();
             Logger.GetInstance().Log($"Player {checkUsername} searched by username");
-            SearchandSortHelper.MergeSortbyHighscoreDesc(players);
+            SearchandSortHelper.MergeSortbyUsername(players);
             if (!SearchandSortHelper.BinarySearchByUsername(players, checkUsername))
             {
                 Console.WriteLine("Not found");
@@ -220,7 +233,7 @@ namespace Assignment
 
         }
 
-        public void PrintList(List<Player> players, string file)
+        public void PrintList(List<Player> players)
         {
             SearchandSortHelper.MergeSortbyHighscoreDesc(players);
 

@@ -19,7 +19,7 @@ namespace Assignment
 {
     internal class Program
     {
-        static void Main(string[] args)
+       static void Main(string[] args)
         {
 
 
@@ -74,7 +74,7 @@ namespace Assignment
                     }
                     else if (choice == 4)
                     {
-                        playerService.PrintList(players, file);
+                        playerService.PrintList(players);
                     }
                     else if (choice == 5)
                     {

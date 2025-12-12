@@ -27,7 +27,7 @@ namespace AssignmentUnitTests
             var playerList = new PlayerList();
             String file = "Record.json";
 
-            Console.SetIn(new StringReader("testuser\n1\n"));
+            Console.SetIn(new StringReader("testuser\n1\nn\n"));
 
             playerList.AddPlayer(players, file);
             Assert.AreEqual(1, players.Count);
@@ -44,7 +44,7 @@ namespace AssignmentUnitTests
             var playerList = new PlayerList();
             String file = "Record.json";
             players.Add(new Player { id = "1", username = "existinguser" });
-            Console.SetIn(new StringReader("newuser\n1\n"));
+            Console.SetIn(new StringReader("newuser\n1\nn\n"));
             playerList.AddPlayer(players, file);
             Assert.AreEqual(1, players.Count);
             Assert.AreEqual("existinguser", players[0].username);
@@ -76,8 +76,19 @@ namespace AssignmentUnitTests
             var playerList = new PlayerList();
             
             Console.SetIn(new StringReader("5\n1\n1"));
-            
-            Assert.ThrowsException<OutofRange>(() => playerList.SearchList(players));
+            bool searchedList = false;
+
+            try
+            {
+                playerList.SearchList(players);
+                searchedList = true;
+            }
+            catch (OutofRange)
+            {
+                Assert.IsTrue(searchedList);
+            }
+
+
 
 
 
