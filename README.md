@@ -1,4 +1,4 @@
-#CET2007 Assignment
+CET2007 Assignment
 
 ## Player Stastics Manager
 
