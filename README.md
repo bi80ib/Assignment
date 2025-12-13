@@ -12,3 +12,5 @@ This project aims to create a system which records, manages and updates data bas
 ## How to run
 - Created in C# using Visual Studio 2022
 - Additional Package (System.Json.Text) Required
+
+For more information check GitWiki
