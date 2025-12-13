@@ -5,9 +5,9 @@
 This project aims to create a system which records, manages and updates data based on data from Players.
 
 ## Project includes :
-Design Patterns ( such as sinlgeton)
-Inheritance 
-Interfaces
+- Design Patterns ( such as sinlgeton)
+- Inheritance 
+- Interfaces
 
 ## How to run
 Created in C# using Visual Studio 2022
